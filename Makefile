@@ -1,7 +1,19 @@
-obj-m += src/mad.o
+#Compile with
+#make ARCH=riscv CROSS_COMPILE=~/noel-buildroot/output/host/bin/riscv64-gaisler-linux-gnu- KERNEL_DIR=~/noel-buildroot/output/build/linux-5.7.19/
+
+MODULE_NAME = mad
+
+SRC := src/mad.c
+
+$(MODULE_NAME)-objs = $(SRC:.c=.o)
+
+obj-m += $(MODULE_NAME).o
+PWD := $(shell pwd)
+
+EXTRA_CFLAGS := -I$(PWD)/src
 
 all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_DIR) M=$(PWD) modules
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
