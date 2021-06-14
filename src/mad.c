@@ -14,17 +14,17 @@ static unsigned int bufsize = 0;
 module_param(bufsize, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(bufsize, "Buffer size");
 
-static int my_init(void)
+static int mad_init(void)
 {
     printk( KERN_NOTICE "mad: driver initialized\n" );
-    printk( KERN_INFO "Bufsize: %d\n", Bufsize);
+    printk( KERN_INFO "Bufsize: %d\n", bufsize);
     return 0;
 }
     
-static void my_exit(void)
+static void mad_exit(void)
 {
     return;
 }
     
-module_init(my_init);
-module_exit(my_exit);
+module_init(mad_init);
+module_exit(mad_exit);
