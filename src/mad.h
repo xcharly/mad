@@ -10,6 +10,7 @@
 #include <linux/fs.h> /* Char device: file operation */
 #include <linux/platform_device.h> /* platform_driver_register() */
 #include <linux/uaccess.h> /* copy_from_user(), copy_to_user() */
+#include <linux/miscdevice.h> /* Misc device */
 
 /*****************************************************************************
 **  Macro definition
@@ -37,6 +38,18 @@ static ssize_t mad_read(struct file * filp, char * buf, size_t len, loff_t * off
  \return 
 */
 static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioctl_param);
+
+/*! Probe call
+ \param[in] : pdev : Pointer to the platform device structure
+ \return : Return 0 on success, < 0 on error
+*/
+static int mad_probe(struct platform_device * pdev);
+
+/*! Unregister the device
+ \param[in] : pdev : Pointer to the platform device structure
+ \return : Return 0 on success, < 0 on error
+*/
+static int mad_remove(struct platform_device * pdev);
 
 static int mad_init(void);
 static void mad_exit(void);

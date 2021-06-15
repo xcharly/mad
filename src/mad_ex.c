@@ -11,9 +11,9 @@ int main (int argc, char ** argv)
     int ret = 0;
     int fd = 0;
 
-    struct mad_mo mo:
+    struct mad_mo mo;
     
-    fd = open(MAD_DEV_FILENAME, 0);
+    fd = open("/dev/"MAD_DEV_FILENAME, 0);
     if ( 0 > fd )
     {
         printf("Cannot open device file: %s\n", MAD_DEV_FILENAME);
@@ -22,7 +22,7 @@ int main (int argc, char ** argv)
 
     /* Test ioctl */
     mo.size = 0x64;
-    ret = ioctl(fd, MAD_IOCTL_MALLOC, mo);
+    ret = ioctl(fd, MAD_IOCTL_MALLOC, &mo);
 
     if ( 0 > ret )
     {
@@ -30,7 +30,7 @@ int main (int argc, char ** argv)
         return -1;
     }
 
-    ret = ioctl(fd, MAD_IOCTL_FREE, mo);
+    ret = ioctl(fd, MAD_IOCTL_FREE, &mo);
 
     if ( 0 > ret )
     {

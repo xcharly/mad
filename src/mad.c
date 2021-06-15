@@ -9,11 +9,11 @@ MODULE_DESCRIPTION("Memory Allocator Driver");
 MODULE_VERSION("0.01");
 
 /* Global variables */
-static unsigned int bufsize = 0;
+//static unsigned int bufsize = 0;
 
 /* Module parameters */
-module_param(bufsize, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(bufsize, "Buffer size");
+//module_param(bufsize, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+//MODULE_PARM_DESC(bufsize, "Buffer size");
 
 /*****************************************************************************
 **  Global Variables
@@ -21,14 +21,26 @@ MODULE_PARM_DESC(bufsize, "Buffer size");
 
 /* File operations */
 static struct file_operations Fops = {
+    .owner = THIS_MODULE,
     .read  = mad_read,
     .unlocked_ioctl = mad_ioctl /* .ioctl for kernel < 2.6.35 */
 };
 
+/* Miscellaneaous driver */
+static struct miscdevice Misc_device_register = {
+    .name  = MAD_DEV_FILENAME,
+    .minor = MISC_DYNAMIC_MINOR,
+    .fops  = &Fops,
+    .mode  = S_IWUGO | S_IRUGO,
+};
+
 /* Platform driver */
 static struct platform_driver mad_drv = {
+    .probe  = mad_probe,
+    .remove = mad_remove,
 	.driver = {
-		.name = "mad",
+		.name  = "mad",
+        .owner = THIS_MODULE,
 	},
 };
 
@@ -72,6 +84,7 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
     {
         case MAD_IOCTL_MALLOC:
             /* Import data from user space to kernel space */
+             printk( KERN_NOTICE "mad: MAD_IOCTL_MALLOC entered" );
             ret =  copy_from_user( &mo, (void *)ioctl_param, sizeof(struct mad_mo) );
             if ( 0 < ret)
             {
@@ -96,16 +109,63 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
     return 1;
 }
 
+/*****************************************************************************
+** FUNCTION: mad_probe
+** INPUTS: 
+**  struct platform_device  * pdev : Pointer to the platform device structure
+** OUTPUTS: 
+** 
+** COMMENTS: Return 0 on success, < 0 on error
+** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+** Probe call
+*******************************************************************************/
+static int mad_probe(struct platform_device * pdev)
+{
+    return 0;
+}
+
+/*****************************************************************************
+** FUNCTION: mad_remove
+** INPUTS: 
+**  struct platform_device  * pdev : Pointer to the platform device structure
+** OUTPUTS: 
+** 
+** COMMENTS: Return 0 on success, < 0 on error
+** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+** Unregister the device
+*******************************************************************************/
+static int mad_remove(struct platform_device * pdev)
+{
+    
+    return 0;
+}
+
 /* Driver functions */
 static int mad_init(void)
 {
-    return platform_driver_register(&mad_drv);
+    int ret = 0;
+    ret = platform_driver_register(&mad_drv);
+    if ( 0 < ret )
+    {
+        printk( KERN_ERR "mad: cannot register platform: %d\n", ret );
+    }
+
+    ret = misc_register(&Misc_device_register);
+    if ( 0 < ret )
+    {
+        printk ( KERN_ERR "mad: cannot register misc: %d\n", ret );
+    }
+
+    printk( KERN_INFO "mad: driver registered\n");
+    return ret;
 }
     
 static void mad_exit(void)
 {
+    misc_deregister(&Misc_device_register);
     platform_driver_unregister(&mad_drv);
 }
     
 module_init(mad_init);
 module_exit(mad_exit);
+ 

@@ -6,6 +6,12 @@
 ******************************************************************************/
 #include <linux/ioctl.h>
 
+#ifndef __KERNEL__
+    #include <stdint.h>
+#else
+    #include <linux/types.h>
+#endif
+
 /*****************************************************************************
 **  Macro definition
 ******************************************************************************/
@@ -14,13 +20,13 @@
 #define MAD_DEV_FILENAME "mad"
 
 /*! Major device number */
-#define MAJOR_NUM 100
+#define MAJOR_NUM 10
 
 /*! Allocate physical memory */
-#define MAD_IOCTL_MALLOC _IOWR(MAJOR_NUM, 0, struct mad_mo)
+#define MAD_IOCTL_MALLOC _IOWR(MAJOR_NUM, 0, struct mad_mo *)
 
 /*! Free physical memory */
-#define MAD_IOCTL_FREE _IOWR(MAJOR_NUM, 1, struct mad_mo)
+#define MAD_IOCTL_FREE _IOWR(MAJOR_NUM, 1, struct mad_mo *)
 
 
 /*****************************************************************************
