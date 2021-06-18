@@ -34,6 +34,8 @@ static struct miscdevice Misc_device_register = {
     .mode  = S_IWUGO | S_IRUGO,
 };
 
+static struct device *Dev;
+
 /* Platform driver */
 static struct platform_driver mad_drv = {
     .probe  = mad_probe,
@@ -43,6 +45,37 @@ static struct platform_driver mad_drv = {
         .owner = THIS_MODULE,
 	},
 };
+
+/*****************************************************************************
+** FUNCTION: mad_phy_malloc
+** INPUTS: 
+**  struct file * filp: file structure according to include/linux/fs.h
+**  char        * buf : buffer including data
+**  size_t        len : length of the buffer
+**  loff_t      * off :
+** OUTPUTS: 
+** 
+** COMMENTS: Return the number of bytes put into the buffer. 0 for EOF.
+** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+** Allocate physical memory for the memory object
+*******************************************************************************/
+static int mad_phy_malloc(struct mad_mo mo *)
+{
+    dma_addr_t phyaddr;
+
+    if ( NULL = mo )
+    {
+        return -ENODEV;
+    }
+
+    /* Adjust the memory size to one page */
+    mo->memsize = (mo->size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+
+    mo->virtaddr = dma_alloc_coherent(Dev, 32, &phyaddr, GFP_KERNEL);
+    mo->phyaddr  = (uint64_t)phyaddr;
+
+    return 0;
+}
 
 /*****************************************************************************
 ** FUNCTION: mad_read
@@ -84,13 +117,11 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
     {
         case MAD_IOCTL_MALLOC:
             /* Import data from user space to kernel space */
-             printk( KERN_NOTICE "mad: MAD_IOCTL_MALLOC entered" );
             ret =  copy_from_user( &mo, (void *)ioctl_param, sizeof(struct mad_mo) );
             if ( 0 < ret)
             {
                 return -EINVAL;
             }
-            printk( KERN_NOTICE "mad: MAD_IOCTL_MALLOC: %d\n", mo.size );
 
             mo.phyaddr = 0x80;      
 
@@ -156,6 +187,8 @@ static int mad_init(void)
         printk ( KERN_ERR "mad: cannot register misc: %d\n", ret );
     }
 
+    Dev = Misc_device_register.this_device;
+    
     printk( KERN_INFO "mad: driver registered\n");
     return ret;
 }

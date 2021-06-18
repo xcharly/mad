@@ -37,9 +37,11 @@
  * @size: size requested in bytes
  * @phyaddr: physical address of the memory object
  */
+
 struct mad_mo {
     uint64_t size;
-    uint32_t phyaddr;
+    uint64_t phyaddr;
+    void *   virtaddr;
 };
 
 #endif /* _MAD_IOCTL_H */

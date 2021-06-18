@@ -12,6 +12,8 @@
 #include <linux/uaccess.h> /* copy_from_user(), copy_to_user() */
 #include <linux/miscdevice.h> /* Misc device */
 
+#include <linux/dma-mapping.h> /* dma_alloc_coherent */
+
 /*****************************************************************************
 **  Macro definition
 ******************************************************************************/
