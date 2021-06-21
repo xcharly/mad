@@ -14,6 +14,8 @@
 
 #include <linux/dma-mapping.h> /* dma_alloc_coherent */
 
+#include "mad_ioctl.h"
+
 /*****************************************************************************
 **  Macro definition
 ******************************************************************************/
@@ -23,6 +25,9 @@
 /*****************************************************************************
 **  Function Prototype Declaration
 ******************************************************************************/
+
+static int mad_phy_malloc(struct mad_mo * mo);
+static int mad_phy_free(struct mad_mo * mo);
 
 /*! Called when a process which already opened the dev file attempts to read from it.
  \param[in] : filp : file structure according to include/linux/fs.h

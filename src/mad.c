@@ -59,21 +59,38 @@ static struct platform_driver mad_drv = {
 ** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ** Allocate physical memory for the memory object
 *******************************************************************************/
-static int mad_phy_malloc(struct mad_mo mo *)
+static int mad_phy_malloc(struct mad_mo * mo)
 {
     dma_addr_t phyaddr;
 
-    if ( NULL = mo )
+    if ( NULL == mo )
     {
         return -ENODEV;
     }
 
     /* Adjust the memory size to one page */
-    mo->memsize = (mo->size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+    mo->size = (mo->size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
 
     mo->virtaddr = dma_alloc_coherent(Dev, 32, &phyaddr, GFP_KERNEL);
+    if ( 0 == mo->virtaddr )
+    {
+        printk(KERN_ERR "mad: Error allocating coeherent memory - mad_phy_malloc()");
+        return -1;
+    }
+
     mo->phyaddr  = (uint64_t)phyaddr;
 
+    return 0;
+}
+
+static int mad_phy_free(struct mad_mo * mo)
+{
+    if ( NULL == mo )
+    {
+        return -ENODEV;
+    }
+
+    dma_free_coherent(Dev, 32, mo->virtaddr, mo->phyaddr);
     return 0;
 }
 
@@ -123,7 +140,7 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
                 return -EINVAL;
             }
 
-            mo.phyaddr = 0x80;      
+            mad_phy_malloc(&mo);
 
             ret = copy_to_user( (void *)ioctl_param, &mo, sizeof(struct mad_mo) );
             if ( 0 < ret)
@@ -133,7 +150,14 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
             break;
         
         case MAD_IOCTL_FREE:
-            printk( KERN_NOTICE "mad: MAD_IOCTL_FREE\n" );
+            /* Import data from user space to kernel space */
+            ret =  copy_from_user( &mo, (void *)ioctl_param, sizeof(struct mad_mo) );
+            if ( 0 < ret)
+            {
+                return -EINVAL;
+            }
+
+            mad_phy_free(&mo);
             break;
     }
 
@@ -188,6 +212,8 @@ static int mad_init(void)
     }
 
     Dev = Misc_device_register.this_device;
+    Dev->coherent_dma_mask = ~0;
+    Dev->dma_mask = &Dev->coherent_dma_mask;
     
     printk( KERN_INFO "mad: driver registered\n");
     return ret;

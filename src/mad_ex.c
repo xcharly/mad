@@ -8,6 +8,7 @@
 
 int main (int argc, char ** argv)
 {
+    uint64_t * p_virtadd = 0;
     int ret = 0;
     int fd = 0;
 
@@ -21,7 +22,7 @@ int main (int argc, char ** argv)
     }
 
     /* Test ioctl */
-    mo.size = 0x64;
+    mo.size = 0x999;
     ret = ioctl(fd, MAD_IOCTL_MALLOC, &mo);
 
     if ( 0 > ret )
@@ -29,6 +30,14 @@ int main (int argc, char ** argv)
         printf("ioctl MAD_IOCTL_MALLOC failed: %d\n", ret);
         return -1;
     }
+    p_virtadd = (uint64_t)mo.virtaddr;
+    printf("Reserved at phyaddr 0x%lx, virtadd 0x%lx, size 0x%lx\n", mo.phyaddr, p_virtadd, mo.size);
+
+    //p_virtadd[0] = 0xdeadbeefcafebabe;
+    //p_virtadd[1] = 0x0123456789abcdef;
+
+    p_virtadd[0] = 0xcafebabe;
+    //p_virtadd[1] = 0x12345678;
 
     ret = ioctl(fd, MAD_IOCTL_FREE, &mo);
 
@@ -38,7 +47,7 @@ int main (int argc, char ** argv)
         return -1;
     }
 
-    printf("mo.phyaddr: %d\n", mo.phyaddr);
+    printf("Memory freed\n");
 
 
     return 1;
