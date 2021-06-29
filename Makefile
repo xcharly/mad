@@ -18,7 +18,7 @@ KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 EXTRA_CFLAGS := -I$(PWD)/src
 
 ## Definition for compiling tests
-CC=gcc
+CC=$(CROSS_COMPILE)gcc
 TST_SRC = src/mad_ex.c
 TST_OBJ = $(patsubst %.c,%.o, $(TST_SRC))
 TST_CFLAGS := -I$(PWD)/src
