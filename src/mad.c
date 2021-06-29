@@ -179,6 +179,8 @@ static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
 	printk(KERN_INFO "mad: vma->vm_end = 0x%x",vma->vm_end);
 	printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x",vma->vm_pgoff);
 
+	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+
 	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff, size, vma->vm_page_prot)) {
 		return -EAGAIN;
 	}
