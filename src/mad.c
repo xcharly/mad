@@ -178,6 +178,7 @@ static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
 	printk(KERN_INFO "mad: vma->vm_start = 0x%x",vma->vm_start);
 	printk(KERN_INFO "mad: vma->vm_end = 0x%x",vma->vm_end);
 	printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x",vma->vm_pgoff);
+	printk(KERN_INFO "mad: size = 0x%x", size);
 
 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
