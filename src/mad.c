@@ -23,7 +23,7 @@ MODULE_VERSION("0.01");
 static struct file_operations Fops = {
     .owner = THIS_MODULE,
     .read  = mad_read,
-    .unlocked_ioctl = mad_ioctl /* .ioctl for kernel < 2.6.35 */
+    .unlocked_ioctl = mad_ioctl, /* .ioctl for kernel < 2.6.35 */
     .mmap = mad_mmap,
 };
 

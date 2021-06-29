@@ -1,0 +1,1 @@
+cmd_/home/mjonian/Projects/Selene/WP2/mad/mad.o := /home/mjonian/Projects/Selene/WP2/noel-buildroot/output/host/bin/riscv64-linux-ld  -melf64lriscv    -r -o /home/mjonian/Projects/Selene/WP2/mad/mad.o /home/mjonian/Projects/Selene/WP2/mad/src/mad.o
