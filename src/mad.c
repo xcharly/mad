@@ -24,6 +24,7 @@ static struct file_operations Fops = {
     .owner = THIS_MODULE,
     .read  = mad_read,
     .unlocked_ioctl = mad_ioctl /* .ioctl for kernel < 2.6.35 */
+    .mmap = mad_mmap,
 };
 
 /* Miscellaneaous driver */
@@ -162,6 +163,23 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
     }
 
     return 1;
+}
+
+/**
+ * mad mmap function
+ */
+static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
+
+	size_t size = vma->vm_end - vma->vm_start;
+
+	printk(KERN_INFO "mad: vma->vm_start = 0x%x",vma->vm_start);
+	printk(KERN_INFO "mad: vma->vm_end = 0x%x",vma->vm_end);
+	printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x",vma->vm_pgoff);
+
+	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff, size, vma->vm_page_prot)) {
+		return -EAGAIN;
+	}
+	return 0;
 }
 
 /*****************************************************************************
