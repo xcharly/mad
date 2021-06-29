@@ -166,7 +166,10 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
 }
 
 /**
- * mad mmap function
+ * @brief mad memory map implementation
+ * @param[in]  file driver file descriptor
+ * @param[in|out]  vma  linear memory region descriptor
+ * @return 0 on success. -ECODE otherwise.
  */
 static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
 
