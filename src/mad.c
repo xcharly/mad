@@ -72,7 +72,7 @@ static int mad_phy_malloc(struct mad_mo * mo)
     /* Adjust the memory size to one page */
     mo->size = (mo->size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
 
-    mo->virtaddr = dma_alloc_coherent(Dev, 32, &phyaddr, GFP_KERNEL);
+    mo->virtaddr = dma_alloc_coherent(Dev, mo->size, &phyaddr, GFP_KERNEL);
     if ( 0 == mo->virtaddr )
     {
         printk(KERN_ERR "mad: Error allocating coeherent memory - mad_phy_malloc()");
@@ -91,7 +91,7 @@ static int mad_phy_free(struct mad_mo * mo)
         return -ENODEV;
     }
 
-    dma_free_coherent(Dev, 32, mo->virtaddr, mo->phyaddr);
+    dma_free_coherent(Dev, mo->size, mo->virtaddr, mo->phyaddr);
     return 0;
 }
 
