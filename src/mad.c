@@ -175,12 +175,12 @@ static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
 
 	size_t size = vma->vm_end - vma->vm_start;
 
-	printk(KERN_INFO "mad: vma->vm_start = 0x%x",vma->vm_start);
-	printk(KERN_INFO "mad: vma->vm_end = 0x%x",vma->vm_end);
-	printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x",vma->vm_pgoff);
-	printk(KERN_INFO "mad: size = 0x%x", size);
+	// printk(KERN_INFO "mad: vma->vm_start = 0x%x\n",vma->vm_start);
+	// printk(KERN_INFO "mad: vma->vm_end = 0x%x\n",vma->vm_end);
+	// printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x\n",vma->vm_pgoff);
+	// printk(KERN_INFO "mad: size = 0x%x\n", size);
 
-	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+	// vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
 	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff, size, vma->vm_page_prot)) {
 		return -EAGAIN;
