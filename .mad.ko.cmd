@@ -1,1 +1,0 @@
-cmd_/home/mjonian/Projects/Selene/WP2/mad/mad.ko := /home/mjonian/Projects/Selene/WP2/noel-buildroot/output/host/bin/riscv64-linux-ld -r  -melf64lriscv  --build-id  -T ./scripts/module-common.lds -T ./arch/riscv/kernel/module.lds -o /home/mjonian/Projects/Selene/WP2/mad/mad.ko /home/mjonian/Projects/Selene/WP2/mad/mad.o /home/mjonian/Projects/Selene/WP2/mad/mad.mod.o;  true
