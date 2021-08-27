@@ -16,6 +16,10 @@ int main (int argc, char ** argv)
     int ret = 0;
     int fd = 0;
 
+    int no_close = 0; /* If set to 1, memory won't be unmap so it can be visualized with devmem */
+    no_close = atoi(argv[1]);
+	
+
     struct mad_mo mo;
     
     fd = open("/dev/"MAD_DEV_FILENAME, O_RDWR | O_SYNC, 0);
@@ -64,8 +68,13 @@ int main (int argc, char ** argv)
     p_virtadd[0] = 0xcafebabe;
     printf("Checking written value: 0x%x\n", p_virtadd[0]);
 
+    if ( 1 == no_close )
+    {
+       return 1;
+    }
 
     printf("Freeing memory...\n");
+   
     ret = ioctl(fd, MAD_IOCTL_FREE, &mo);
 
     if ( 0 > ret )
