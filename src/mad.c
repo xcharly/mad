@@ -66,20 +66,21 @@ static int mad_phy_malloc(struct mad_mo * mo)
 
     if ( NULL == mo )
     {
-        return -ENODEV;
+        return -1;
     }
 
     /* Adjust the memory size to one page */
     mo->size = (mo->size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
 
     mo->virtaddr = dma_alloc_coherent(Dev, mo->size, &phyaddr, GFP_KERNEL);
-    if ( 0 == mo->virtaddr )
+    if ( mo->virtaddr == NULL )
     {
         printk(KERN_ERR "mad: Error allocating coeherent memory - mad_phy_malloc()");
         return -1;
     }
 
-    mo->phyaddr  = (uint64_t)phyaddr;
+    mo->phyaddr = (uint64_t)phyaddr;
+    mo->virt_to_phyaddr = virt_to_phys(mo->virtaddr);
 
     return 0;
 }
@@ -88,7 +89,7 @@ static int mad_phy_free(struct mad_mo * mo)
 {
     if ( NULL == mo )
     {
-        return -ENODEV;
+        return -1;
     }
 
     dma_free_coherent(Dev, mo->size, mo->virtaddr, mo->phyaddr);
@@ -138,15 +139,19 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
             ret =  copy_from_user( &mo, (void *)ioctl_param, sizeof(struct mad_mo) );
             if ( 0 < ret)
             {
-                return -EINVAL;
+                return -1;
             }
 
-            mad_phy_malloc(&mo);
+            if (mad_phy_malloc(&mo) < 0) {
+
+                printk("mad_phy_malloc() failed.");
+                return -1;
+            }
 
             ret = copy_to_user( (void *)ioctl_param, &mo, sizeof(struct mad_mo) );
             if ( 0 < ret)
             {
-                return -EINVAL;
+                return -1;
             }
             break;
         
@@ -155,7 +160,7 @@ static long mad_ioctl(struct file * f, unsigned int ioctl_num, unsigned long ioc
             ret =  copy_from_user( &mo, (void *)ioctl_param, sizeof(struct mad_mo) );
             if ( 0 < ret)
             {
-                return -EINVAL;
+                return -1;
             }
 
             mad_phy_free(&mo);
@@ -175,10 +180,11 @@ static int mad_mmap(struct file *file, struct vm_area_struct *vma) {
 
 	size_t size = vma->vm_end - vma->vm_start;
 
-	// printk(KERN_INFO "mad: vma->vm_start = 0x%x\n",vma->vm_start);
-	// printk(KERN_INFO "mad: vma->vm_end = 0x%x\n",vma->vm_end);
-	// printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x\n",vma->vm_pgoff);
-	// printk(KERN_INFO "mad: size = 0x%x\n", size);
+	printk(KERN_INFO "mad: vma->vm_start = 0x%x\n", vma->vm_start);
+	printk(KERN_INFO "mad: vma->vm_end = 0x%x\n", vma->vm_end);
+	printk(KERN_INFO "mad: vma->vm_pgoff = 0x%x\n", vma->vm_pgoff);
+    printk(KERN_INFO "mad: vma->vm_page_prot = 0x%x\n", vma->vm_page_prot);
+	printk(KERN_INFO "mad: size = 0x%x\n", size);
 
 	// vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 

@@ -41,6 +41,7 @@
 struct mad_mo {
     uint64_t size;
     uint64_t phyaddr;
+    uint64_t virt_to_phyaddr;
     void *   virtaddr;
 };
 
