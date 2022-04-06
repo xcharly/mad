@@ -19,6 +19,12 @@
 /*****************************************************************************
 **  Macro definition
 ******************************************************************************/
+#ifdef MAD_DEBUG
+  #define MAD_DEBUG_LOG(fmt, ...) printk( KERN_INFO pr_fmt(fmt), ##__VA_ARGS__ )
+#else
+  #define MAD_DEBUG_LOG(fmt, ...)
+#endif
+
 
 
 
