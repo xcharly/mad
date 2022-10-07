@@ -62,10 +62,19 @@ static struct platform_driver mad_drv = {
 *******************************************************************************/
 static int mad_phy_malloc(struct mad_mo * mo)
 {
+    int ret = 1;
     dma_addr_t phyaddr;
 
     if ( NULL == mo )
     {
+        return -1;
+    }
+
+    /* The devices can only address 32 bits*/
+    ret = dma_set_mask_and_coherent (Dev, DMA_BIT_MASK(32));
+    if ( 0 != ret )
+    {
+        printk(KERN_ERR "mad: Error allocating coeherent memory - dma_set_mask_and_coherent()");
         return -1;
     }
 
